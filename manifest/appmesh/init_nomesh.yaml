@@ -1,0 +1,226 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: front
+  namespace: appmeshload
+spec:
+  ports:
+    - port: 8090
+      name: http
+  selector:
+    app: front
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: front
+  namespace: appmeshload
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: front
+  template:
+    metadata:
+      labels:
+        app: front
+    spec:
+      containers:
+        - name: app
+          image:  zhaojiew/appmeshload:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8090
+          env:
+            - name: "FORWARD_HOST"
+              value: "red.appmeshload.svc.cluster.local"
+            - name: "FORWARD_PORT"
+              value: "8090"
+            - name: "FORWARD_PATH"
+              value: "/forward"
+            - name: "TEXT"
+              value: "check red log"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: blue
+  namespace: appmeshload
+spec:
+  ports:
+    - port: 8090
+      name: http
+  selector:
+    app: color
+    version: blue
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blue
+  namespace: appmeshload
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: color
+      version: blue
+  template:
+    metadata:
+      labels:
+        app: color
+        version: blue
+    spec:
+      containers:
+        - name: app
+          image:  zhaojiew/appmeshload:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8090
+          env:
+            - name: "FORWARD_HOST"
+              value: "apple.appmeshload.svc.cluster.local"
+            - name: "FORWARD_PATH"
+              value: "/get"
+            - name: "TEXT"
+              value: "blue"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: red
+  namespace: appmeshload
+spec:
+  ports:
+    - port: 8090
+      name: http
+  selector:
+    app: color
+    version: red
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: red
+  namespace: appmeshload
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: color
+      version: red
+  template:
+    metadata:
+      labels:
+        app: color
+        version: red
+    spec:
+      containers:
+        - name: app
+          image: zhaojiew/appmeshload:latest
+          ports:
+            - containerPort: 8090
+          env:
+            - name: "FORWARD_HOST"
+              value: "banana.appmeshload.svc.cluster.local"
+            - name: "FORWARD_PATH"
+              value: "/get"
+            - name: "TEXT"
+              value: "red"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: color
+  namespace: appmeshload
+spec:
+  ports:
+    - port: 8090
+      name: http
+
+# upstream load
+# apple
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fruit
+  namespace: appmeshload
+spec:
+  ports:
+    - port: 8090
+      name: http
+  selector:
+    app: fruit
+    version: apple
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apple
+  namespace: appmeshload
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fruit
+      version: apple
+  template:
+    metadata:
+      labels:
+        app: fruit
+        version: apple
+    spec:
+      containers:
+        - name: app
+          image:  zhaojiew/appmeshload:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8090
+          env:
+            - name: "FORWARD_PATH"
+              value: "/get"
+            - name: "TEXT"
+              value: "apple"
+---
+# banana
+apiVersion: v1
+kind: Service
+metadata:
+  name: banana
+  namespace: appmeshload
+spec:
+  ports:
+    - port: 8090
+      name: http
+  selector:
+    app: fruit
+    version: banana
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: banana
+  namespace: appmeshload
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fruit
+      version: banana
+  template:
+    metadata:
+      labels:
+        app: fruit
+        version: banana
+    spec:
+      containers:
+        - name: app
+          image: zhaojiew/appmeshload:latest
+          ports:
+            - containerPort: 8090
+          env:
+            - name: "FORWARD_PATH"
+              value: "/get"
+            - name: "TEXT"
+              value: "banana"
