@@ -1,0 +1,43 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: vs-color
+  namespace: appmeshload
+spec:
+  hosts:
+    - svc-color
+  http:
+  - route:
+    - destination:
+        host: svc-color.appmeshload.svc.cluster.local
+        subset: v2
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: vs-fruit
+  namespace: appmeshload
+spec:
+  hosts:
+    - svc-fruit
+  http:
+  - route:
+    - destination:
+        host: svc-fruit.appmeshload.svc.cluster.local
+        subset: v1
+
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: vs-front
+  namespace: appmeshload
+spec:
+  hosts:
+    - svc-front
+  http:
+  - route:
+    - destination:
+        host: svc-front.appmeshload.svc.cluster.local
+        subset: v1
