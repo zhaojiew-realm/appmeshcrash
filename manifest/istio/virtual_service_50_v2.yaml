@@ -23,10 +23,13 @@ spec:
   http:
   - route:
     - destination:
-        host: color.appmeshload.svc.cluster.local
+        host: color
         subset: v1
-        port:
-          number: 8090
+      weight: 50
+    - destination:
+        host: color
+        subset: v3
+      weight: 50
 
 ---
 apiVersion: networking.istio.io/v1alpha3

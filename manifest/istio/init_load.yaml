@@ -25,8 +25,8 @@ spec:
   template:
     metadata:
       labels:
-        version: v1
         app: front
+        version: v1
     spec:
       containers:
         - name: app
@@ -116,7 +116,6 @@ spec:
               value: "/get"
             - name: "TEXT"
               value: "color-v2"
-
 # upstream load
 ---
 apiVersion: v1

@@ -1,9 +1,11 @@
+# https://cloud.tencent.com/document/product/1261/62955
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
   name: front
+  namespace: appmeshload
 spec:
-  host: front.appmeshload.svc.cluster.local
+  host: front
   subsets:
   - name: v1
     labels:
@@ -13,15 +15,13 @@ apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
   name: color
+  namespace: appmeshload
 spec:
-  host: color.appmeshload.svc.cluster.local
-  trafficPolicy:
-    loadBalancer:
-      simple: RANDOM
+  host: color
   subsets:
   - name: v1
     labels:
-      version: v1
+      version: v1 # subset v1 通过标签 version:v1 来匹配该服务的endpoin
   - name: v2
     labels:
       version: v2
@@ -30,8 +30,9 @@ apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
   name: fruit
+  namespace: appmeshload
 spec:
-  host: fruit.appmeshload.svc.cluster.local
+  host: fruit
   subsets:
   - name: v1
     labels:
