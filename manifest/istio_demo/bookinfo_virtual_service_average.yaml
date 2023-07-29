@@ -27,14 +27,19 @@ spec:
         subset: v1
         port:
           number: 8090
-      weight: 50
+      weight: 40
     - destination:
         host: color
         subset: v2
         port:
           number: 8090
-      weight: 50
-
+      weight: 30
+    - destination:
+        host: color
+        subset: v3
+        port:
+          number: 8090
+      weight: 30
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
@@ -46,14 +51,37 @@ spec:
   - fruit
   http:
   - route:
-    # - destination:
-    #     host: fruit
-    #     subset: v1
-    #     port:
-    #       number: 8090
-    #   weight: 50
     - destination:
         host: fruit
+        subset: v1
+        port:
+          number: 8090
+      weight: 50
+    - destination:
+        host: fruit
+        subset: v2
+        port:
+          number: 8090
+      weight: 50
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: animal
+  namespace: appmeshload
+spec:
+  hosts:
+  - animal
+  http:
+  - route:
+    - destination:
+        host: animal
+        subset: v1
+        port:
+          number: 8090
+      weight: 50
+    - destination:
+        host: animal
         subset: v2
         port:
           number: 8090

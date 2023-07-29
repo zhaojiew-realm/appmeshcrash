@@ -23,17 +23,10 @@ spec:
   http:
   - route:
     - destination:
-        host: color
+        host: color.appmeshload.svc.cluster.local
         subset: v1
         port:
           number: 8090
-      weight: 50
-    - destination:
-        host: color
-        subset: v2
-        port:
-          number: 8090
-      weight: 50
 
 ---
 apiVersion: networking.istio.io/v1alpha3
@@ -46,15 +39,24 @@ spec:
   - fruit
   http:
   - route:
-    # - destination:
-    #     host: fruit
-    #     subset: v1
-    #     port:
-    #       number: 8090
-    #   weight: 50
     - destination:
-        host: fruit
-        subset: v2
+        host: fruit.appmeshload.svc.cluster.local
+        subset: v1
         port:
           number: 8090
-      weight: 50
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: animal
+  namespace: appmeshload
+spec:
+  hosts:
+  - animal
+  http:
+  - route:
+    - destination:
+        host: animal.appmeshload.svc.cluster.local
+        subset: v1
+        port:
+          number: 8090

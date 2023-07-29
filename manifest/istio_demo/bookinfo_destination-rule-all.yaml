@@ -1,0 +1,60 @@
+# https://cloud.tencent.com/document/product/1261/62955
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: front
+  namespace: appmeshload
+spec:
+  host: front
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: color
+  namespace: appmeshload
+spec:
+  host: color
+  subsets:
+  - name: v1
+    labels:
+      version: v1 # subset v1 通过标签 version:v1 来匹配该服务的endpoin
+  - name: v2
+    labels:
+      version: v2
+  - name: v3
+    labels:
+      version: v3
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: fruit
+  namespace: appmeshload
+spec:
+  host: fruit
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+  - name: v2
+    labels:
+      version: v2
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: animal
+  namespace: appmeshload
+spec:
+  host: animal
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+  - name: v2
+    labels:
+      version: v2

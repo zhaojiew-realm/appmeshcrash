@@ -35,14 +35,10 @@ spec:
           ports:
             - containerPort: 8090
           env:
-            - name: "FORWARD_HOST"
-              value: "color.appmeshload.svc.cluster.local"
-            - name: "FORWARD_PORT"
-              value: "8090"
-            - name: "FORWARD_PATH"
-              value: "/forward"
             - name: "TEXT"
               value: "front"
+            - name: "MULTIHOST"
+              value: "http://color.appmeshload.svc.cluster.local:8090/forward,http://animal.appmeshload.svc.cluster.local:8090/get"
 ---
 apiVersion: v1
 kind: Service
@@ -212,3 +208,69 @@ spec:
           env:
             - name: "TEXT"
               value: "fruit-v2"
+# animal load
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: animal
+  namespace: appmeshload
+spec:
+  ports:
+    - port: 8090
+      name: http
+  selector:
+    app: animal
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: animal-v1
+  namespace: appmeshload
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: animal
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: animal
+        version: v1
+    spec:
+      containers:
+        - name: app
+          image:  zhaojiew/appmeshload:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8090
+          env:
+            - name: "TEXT"
+              value: "animal-v1"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: animal-v2
+  namespace: appmeshload
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: animal
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: animal
+        version: v2
+    spec:
+      containers:
+        - name: app
+          image: zhaojiew/appmeshload:latest
+          ports:
+            - containerPort: 8090
+          env:
+            - name: "TEXT"
+              value: "animal-v2"
