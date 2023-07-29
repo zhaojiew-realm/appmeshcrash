@@ -25,10 +25,14 @@ spec:
     - destination:
         host: color
         subset: v1
+        port:
+          number: 8090
       weight: 50
     - destination:
         host: color
-        subset: v3
+        subset: v2
+        port:
+          number: 8090
       weight: 50
 
 ---
@@ -43,7 +47,7 @@ spec:
   http:
   - route:
     - destination:
-        host: fruit.appmeshload.svc.cluster.local
+        host: fruit
         subset: v1
         port:
           number: 8090
