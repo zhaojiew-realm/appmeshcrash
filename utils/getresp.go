@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"crypto/tls"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -12,10 +13,14 @@ func FordardGet(h string, timeout int, r *http.Request, w http.ResponseWriter) s
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return ""
 	}
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
 
 	// set timeout
 	client := &http.Client{
-		Timeout: time.Second * time.Duration(timeout),
+		Timeout:   time.Second * time.Duration(timeout),
+		Transport: tr,
 	}
 
 	resp, err := client.Do(req)
