@@ -1,0 +1,84 @@
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: center
+  namespace: appmeshload
+spec:
+  hosts:
+  - "center.liarlee.site"
+  ports:
+  - number: 4000
+    name: http
+    protocol: HTTP
+  resolution: DNS
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: egressgateway-for-center
+  namespace: appmeshload
+spec:
+  host: istio-egressgateway.istio-system.svc.cluster.local
+  subsets:
+  - name: center
+    labels:
+      istio: egressgateway
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: direct-center-through-egress-gateway
+  namespace: appmeshload
+spec:
+  hosts:
+  - "center.liarlee.site"
+  gateways:
+  - istio-egressgateway
+  tls:
+  - match:
+    - gateways:
+      - mesh
+      port: 4000
+      sniHosts:
+      - "center.liarlee.site"
+    route:
+    - destination:
+        host: istio-egressgateway.istio-system.svc.cluster.local
+        subset: center
+        port:
+          number: 400
+      weight: 100
+  - match:
+    - gateways:
+      - istio-egressgateway
+      port: 4000
+      sniHosts:
+      - "center.liarlee.site"
+    route:
+    - destination:
+        host: "center.liarlee.site"
+        port:
+          number: 4000
+      weight: 100
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: istio-egressgateway
+  namespace: appmeshload
+spec:
+  selector:
+    istio: egressgateway
+  servers:
+  - port:
+      number: 4000
+      name: http
+      protocol: HTTP
+    hosts:
+    - "center.liarlee.site"
+    tls:
+      mode: PASSTHROUGH
+

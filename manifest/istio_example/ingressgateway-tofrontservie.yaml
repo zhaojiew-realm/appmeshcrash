@@ -1,0 +1,36 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: ingress-front-gateway
+  namespace: appmeshload
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 8090
+      name: http
+      protocol: HTTP
+    hosts:
+    - "front.liarlee.site"
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: ingress-front-vs
+  namespace: appmeshload
+spec:
+  hosts:
+  - "front.liarlee.site"
+  gateways:
+  - ingress-front-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /forward
+    route:
+    - destination:
+        port:
+          number: 8090
+        host: svc-front.appmeshload.svc.cluster.local

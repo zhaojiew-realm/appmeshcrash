@@ -3,6 +3,8 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: appmeshload
+  labels:
+    istio-injection: enabled
 
 ---
 apiVersion: v1
@@ -49,8 +51,8 @@ spec:
               value: "8090"
             - name: "FORWARD_PATH"
               value: "/forward"
-                #             - name: MULTIHOST
-                #               value: "http://svc-color.appmeshload.svc.cluster.local:8090/forward"
+                #- name: MULTIHOST
+                #  value: "http://svc-color.appmeshload.svc.cluster.local:8090/forward,http://svc-fruit.appmeshload.svc.cluster.local:8090/forward"
             - name: "TEXT"
               value: "check color service log"
 
@@ -127,7 +129,7 @@ spec:
             - name: "FORWARD_HOST"
               value: "svc-fruit.appmeshload.svc.cluster.local"
             - name: "FORWARD_PATH"
-              value: "/get"
+              value: "/multihost"
             - name: "TEXT"
               value: "color-v2"
 
@@ -170,10 +172,10 @@ spec:
           ports:
             - containerPort: 8090
           env:
-            - name: "FORWARD_PATH"
-              value: "/get"
+            - name: MULTIHOST
+              value: "http://center.liarlee.site:4000/"
             - name: "TEXT"
-              value: "fruit-v1"
+              value: "to center"
 
 ---
 apiVersion: apps/v1
@@ -199,8 +201,11 @@ spec:
           ports:
             - containerPort: 8090
           env:
-            - name: "FORWARD_PATH"
-              value: "/get"
+            #             - name: "FORWARD_PATH"
+            #               value: "/get"
+            #             - name: "TEXT"
+            #               value: "fruit-v2"
+            - name: MULTIHOST
+              value: "http://www.baidu.com/"
             - name: "TEXT"
-              value: "fruit-v2"
-
+              value: "to baidu"

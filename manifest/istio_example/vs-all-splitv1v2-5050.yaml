@@ -31,6 +31,11 @@ spec:
     - destination:
         host: svc-fruit.appmeshload.svc.cluster.local
         subset: v1
+      weight: 50
+    - destination:
+        host: svc-fruit.appmeshload.svc.cluster.local
+        subset: v2
+      weight: 50
 
 ---
 apiVersion: networking.istio.io/v1beta1

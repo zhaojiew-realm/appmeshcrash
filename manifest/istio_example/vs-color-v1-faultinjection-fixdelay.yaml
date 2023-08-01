@@ -1,0 +1,24 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: vs-color
+  namespace: appmeshload
+spec:
+  hosts:
+    - svc-color
+  http:
+  - route:
+    - destination:
+        host: svc-color.appmeshload.svc.cluster.local
+        subset: v2
+      weight: 50
+    - destination:
+        host: svc-color.appmeshload.svc.cluster.local
+        subset: v1
+      weight: 50
+    fault:
+      delay:
+        percentage:
+          value: 1
+        fixedDelay: 20s

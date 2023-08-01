@@ -1,0 +1,23 @@
+--- apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: vs-fruit
+  namespace: appmeshload
+spec:
+  hosts:
+    - svc-fruit
+  http:
+  - route:
+    - destination:
+        host: svc-fruit.appmeshload.svc.cluster.local
+        subset: v2
+      weight: 50
+    - destination:
+        host: svc-fruit.appmeshload.svc.cluster.local
+        subset: v1
+      weight: 50
+    fault:
+      delay:
+        percentage:
+          value: 1
+        fixedDelay: 20s

@@ -25,7 +25,7 @@ spec:
   - route:
     - destination:
         host: svc-fruit.appmeshload.svc.cluster.local
-        subset: v1
+        subset: v2
 
 ---
 apiVersion: networking.istio.io/v1beta1

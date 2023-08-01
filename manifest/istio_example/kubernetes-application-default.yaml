@@ -1,0 +1,215 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: appmeshload
+  labels:
+    istio-injection: enabled
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-front
+  namespace: appmeshload
+spec:
+  selector:
+    app: front
+  ports:
+    - port: 8090
+      name: svc-front
+      appProtocol: http
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-front
+  namespace: appmeshload
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: front
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: front
+        version: v1
+    spec:
+      containers:
+        - name: deploy-front
+          image:  zhaojiew/appmeshload:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8090
+          env:
+            - name: "FORWARD_HOST"
+              value: "svc-color.appmeshload.svc.cluster.local"
+            - name: "FORWARD_PORT"
+              value: "8090"
+            - name: "FORWARD_PATH"
+              value: "/forward"
+                #- name: MULTIHOST
+                #  value: "http://svc-color.appmeshload.svc.cluster.local:8090/forward,http://svc-fruit.appmeshload.svc.cluster.local:8090/forward"
+            - name: "TEXT"
+              value: "check color service log"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-color
+  namespace: appmeshload
+spec:
+  selector:
+    app: color
+  ports:
+    - port: 8090
+      name: http
+      appProtocol: http
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-color-v1
+  namespace: appmeshload
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: color
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: color
+        version: v1
+    spec:
+      containers:
+        - name: color-v1
+          image:  zhaojiew/appmeshload:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8090
+          env:
+            - name: "FORWARD_HOST"
+              value: "svc-fruit.appmeshload.svc.cluster.local"
+            - name: "FORWARD_PATH"
+              value: "/get"
+            - name: "TEXT"
+              value: "color-v1"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-color-v2
+  namespace: appmeshload
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: color
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: color
+        version: v2
+    spec:
+      containers:
+        - name: color-v2
+          image: zhaojiew/appmeshload:latest
+          ports:
+            - containerPort: 8090
+          env:
+            - name: "FORWARD_HOST"
+              value: "svc-fruit.appmeshload.svc.cluster.local"
+            - name: "FORWARD_PATH"
+              value: "/multihost"
+            - name: "TEXT"
+              value: "color-v2"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-fruit
+  namespace: appmeshload
+spec:
+  selector:
+    app: fruit
+  ports:
+    - port: 8090
+      name: http
+      appProtocol: http
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-fruit-v1
+  namespace: appmeshload
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fruit
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: fruit
+        version: v1
+    spec:
+      containers:
+        - name: fruit-v1
+          image:  zhaojiew/appmeshload:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8090
+          env:
+            - name: "FORWARD_PATH"
+              value: "/get"
+            - name: "TEXT"
+              value: "fruit-v1"
+                #- name: MULTIHOST
+                #  value: "http://center.liarlee.site:4000/"
+                #- name: "TEXT"
+                #  value: "to center"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-fruit-v2
+  namespace: appmeshload
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fruit
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: fruit
+        version: v2
+    spec:
+      containers:
+        - name: fruit-v2
+          image: zhaojiew/appmeshload:latest
+          ports:
+            - containerPort: 8090
+          env:
+            - name: "FORWARD_PATH"
+              value: "/get"
+            - name: "TEXT"
+              value: "fruit-v2"
+            #- name: MULTIHOST
+            #  value: "https://www.baidu.com/"
+            #- name: "TEXT"
+            #  value: "to baidu"
