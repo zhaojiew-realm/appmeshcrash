@@ -12,6 +12,8 @@ import (
 var hostUID = utils.GetHostUID()
 
 func main() {
+	// confirm the version
+	log.Println("welcome to appmeshload v1.0")
 	// print configure info from env
 	log.Printf("starting server on port %s\n", utils.GetServerPort())
 	log.Printf("host unique identifer: %s\n", hostUID)

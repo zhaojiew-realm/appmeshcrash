@@ -14,7 +14,11 @@ func ForwardGet(h string, timeout int, r *http.Request, w http.ResponseWriter, h
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return ""
 	}
-	req.Header = header
+	for k, v := range header {
+		for _, value := range v {
+			req.Header.Add(k, value)
+		}
+	}
 
 	// set timeout and skip tls
 	tr := &http.Transport{
