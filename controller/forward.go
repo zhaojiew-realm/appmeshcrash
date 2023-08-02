@@ -29,13 +29,18 @@ func forwardHandler(w http.ResponseWriter, r *http.Request) {
 
 	//send back customer header with hostUID
 	w.Header().Add("HostUID", hostUID)
+
+	// get request id
+	requestID := r.Header.Get("X-Request-Id")
+
+	// set statuscode
 	w.WriteHeader(responseStatus)
 	if responseStatus == http.StatusOK {
 		// forward request to upstream server
-		resp := utils.FordardGet(h, timeout, r, w)
+		resp := utils.ForwardGet(h, timeout, r, w, r.Header)
 		log.Printf("successfully forward request to upstream server %s \n", h)
 
-		fmt.Fprintf(w, "[SINGLE] %s ==> %s \n", t, resp)
+		fmt.Fprintf(w, "[SINGLE] %s (%s) ==> %s \n", t, requestID, resp)
 	} else {
 		fmt.Fprintf(w, "%s no response 4 u", hostUID)
 	}

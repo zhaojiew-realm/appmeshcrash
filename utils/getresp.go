@@ -2,12 +2,13 @@ package utils
 
 import (
 	"crypto/tls"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 )
 
-func FordardGet(h string, timeout int, r *http.Request, w http.ResponseWriter) string {
+func ForwardGet(h string, timeout int, r *http.Request, w http.ResponseWriter, header http.Header) string {
+
 	req, err := http.NewRequest("GET", h, r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -29,7 +30,7 @@ func FordardGet(h string, timeout int, r *http.Request, w http.ResponseWriter) s
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return "[ERROR] error occur when request"
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return "[ERROR] error occur when getbody"
