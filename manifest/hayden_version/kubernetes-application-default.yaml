@@ -4,7 +4,7 @@ kind: Namespace
 metadata:
   name: appmeshload
   labels:
-    istio-injection: enabled
+    istio-injection: disabled
 
 ---
 apiVersion: v1
@@ -38,9 +38,11 @@ spec:
         app: front
         version: v1
     spec:
+      nodeSelector: 
+        kubernetes.io/hostname: ip-172-31-51-1.cn-north-1.compute.internal
       containers:
         - name: deploy-front
-          image:  zhaojiew/appmeshload:latest
+          image:  reg.liarlee.site/library/appmeshload:v6
           imagePullPolicy: Always
           ports:
             - containerPort: 8090
@@ -88,9 +90,11 @@ spec:
         app: color
         version: v1
     spec:
+      nodeSelector: 
+        kubernetes.io/hostname: ip-172-31-51-1.cn-north-1.compute.internal
       containers:
         - name: color-v1
-          image:  zhaojiew/appmeshload:latest
+          image:  reg.liarlee.site/library/appmeshload:v6
           imagePullPolicy: Always
           ports:
             - containerPort: 8090
@@ -120,9 +124,11 @@ spec:
         app: color
         version: v2
     spec:
+      nodeSelector: 
+        kubernetes.io/hostname: ip-172-31-51-1.cn-north-1.compute.internal
       containers:
         - name: color-v2
-          image: zhaojiew/appmeshload:latest
+          image: reg.liarlee.site/library/appmeshload:v6
           ports:
             - containerPort: 8090
           env:
@@ -165,17 +171,23 @@ spec:
         app: fruit
         version: v1
     spec:
+      nodeSelector: 
+        kubernetes.io/hostname: ip-172-31-51-1.cn-north-1.compute.internal
       containers:
         - name: fruit-v1
-          image:  zhaojiew/appmeshload:latest
+          image:  reg.liarlee.site/library/appmeshload:v6
           imagePullPolicy: Always
           ports:
             - containerPort: 8090
           env:
-            - name: MULTIHOST
-              value: "http://center.liarlee.site:4000/"
+            - name: "FORWARD_PATH"
+              value: "/get"
             - name: "TEXT"
-              value: "to center"
+              value: "fruit-v1"
+                #- name: MULTIHOST
+                #  value: "http://center.liarlee.site:4000/"
+                #- name: "TEXT"
+                #  value: "to center"
 
 ---
 apiVersion: apps/v1
@@ -195,17 +207,19 @@ spec:
         app: fruit
         version: v2
     spec:
+      nodeSelector: 
+        kubernetes.io/hostname: ip-172-31-51-1.cn-north-1.compute.internal
       containers:
         - name: fruit-v2
-          image: zhaojiew/appmeshload:latest
+          image: reg.liarlee.site/library/appmeshload:v6
           ports:
             - containerPort: 8090
           env:
-            #             - name: "FORWARD_PATH"
-            #               value: "/get"
-            #             - name: "TEXT"
-            #               value: "fruit-v2"
-            - name: MULTIHOST
-              value: "http://www.baidu.com/"
+            - name: "FORWARD_PATH"
+              value: "/get"
             - name: "TEXT"
-              value: "to baidu"
+              value: "fruit-v2"
+            #- name: MULTIHOST
+            #  value: "https://www.baidu.com/"
+            #- name: "TEXT"
+            #  value: "to baidu"

@@ -9,11 +9,13 @@ echo -e "Pod Name:\t $POD_NAME"
 echo -e "Pod IP:\t   $GW_IP"
 echo -e "Doamin Name:\t   $FQDN"
 
-sleep 2s;
+sleep 1s;
 
-while true
-do 
-    curl -X GET -s http://"$FQDN":8090/forward;
-    sleep 0.1s;
-done
+curl -X GET http://"$FQDN":8090/forward;
+
+# while true
+# do 
+#     curl -X GET http://"$FQDN":8090/forward;
+#     sleep 0.1s;
+# done
 
