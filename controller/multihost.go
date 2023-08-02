@@ -42,7 +42,7 @@ func multihostHandler(w http.ResponseWriter, r *http.Request) {
 			// forward request to upstream server
 			resp := utils.ForwardGet(h, timeout, r, w, r.Header)
 			log.Printf("successfully forward request to upstream server %s \n", h)
-			fmt.Fprintf(w, "[MULTI] %s ==> %s \n", t, requestID, resp)
+			fmt.Fprintf(w, "[MULTI] %s (%s)==> %s \n", t, requestID, resp)
 		} else {
 			fmt.Fprintf(w, "%s no response 4 u", hostUID)
 		}
