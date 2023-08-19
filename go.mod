@@ -1,4 +1,4 @@
-module github.com/zhojiew/appmesh-load
+module github.com/zhaojiew-realm/appmeshcrash
 
 go 1.18
 

@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/zhojiew/appmesh-load/controller"
-	"github.com/zhojiew/appmesh-load/utils"
+	"github.com/zhaojiew-realm/appmeshcrash/controller"
+	"github.com/zhaojiew-realm/appmeshcrash/utils"
 )
 
 var hostUID = utils.GetHostUID()
