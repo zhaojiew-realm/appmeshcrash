@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/zhojiew/appmesh-load/model"
-	"github.com/zhojiew/appmesh-load/utils"
+	"github.com/zhaojiew-realm/appmeshcrash/model"
+	"github.com/zhaojiew-realm/appmeshcrash/utils"
 )
 
 var responseStatus = http.StatusOK
@@ -31,5 +31,4 @@ func RegisterRoutes() {
 	registerPingRoute()
 	registerFaultRoute()
 	registerMultiRoute()
-	registerHelloRoute()
 }

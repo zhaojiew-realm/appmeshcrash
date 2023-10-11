@@ -9,7 +9,7 @@ import (
 
 // default configuration
 const DefaultPort = "8090"
-const DefaultText = "default echo"
+const DefaultText = "welcome to appmeshload"
 const DefaultHost = "127.0.0.1"
 const DefaultFport = "8090"
 const DefaultFpath = "/get"

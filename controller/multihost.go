@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/zhojiew/appmesh-load/utils"
+	"github.com/zhaojiew-realm/appmeshcrash/utils"
 )
 
 func registerMultiRoute() {
