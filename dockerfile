@@ -8,8 +8,8 @@ RUN go mod download
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags '-s -w --extldflags "-static -fpic"' -a -installsuffix nocgo -o /server .
 
 # stage 2
-FROM scratch
-# FROM public.ecr.aws/amazonlinux/amazonlinux:2
+# FROM scratch
+FROM public.ecr.aws/amazonlinux/amazonlinux:2
 COPY --from=builder /server bin/server
 
 # slime

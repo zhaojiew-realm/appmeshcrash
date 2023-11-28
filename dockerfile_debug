@@ -1,0 +1,33 @@
+# Use the official Ubuntu image as the base image
+# stage 1
+FROM golang:1.18.10 AS builder
+ENV GOPROXY="https://goproxy.cn,direct"
+
+WORKDIR /bin
+COPY . .
+RUN go mod download
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags '-s -w --extldflags "-static -fpic"' -a -installsuffix nocgo -o /server .
+
+# stage 2
+FROM public.ecr.aws/ubuntu/ubuntu:latest
+# Update the package list and install necessary packages
+COPY --from=builder /server bin/server
+
+RUN apt-get update
+RUN mv /etc/apt/sources.list /etc/apt/sources_backup.list && \
+echo "deb http://mirrors.ustc.edu.cn/ubuntu/ focal main restricted " >> /etc/apt/sources.list && \
+echo "deb http://mirrors.ustc.edu.cn/ubuntu/ focal-updates main restricted " >> /etc/apt/sources.list && \
+echo "deb http://mirrors.ustc.edu.cn/ubuntu/ focal universe " >> /etc/apt/sources.list && \
+echo "deb http://mirrors.ustc.edu.cn/ubuntu/ focal-updates universe " >> /etc/apt/sources.list && \
+echo "deb http://mirrors.ustc.edu.cn/ubuntu/ focal multiverse " >> /etc/apt/sources.list && \
+echo "deb http://mirrors.ustc.edu.cn/ubuntu/ focal-updates multiverse " >> /etc/apt/sources.list && \
+echo "deb http://mirrors.ustc.edu.cn/ubuntu/ focal-backports main restricted universe multiverse " >> /etc/apt/sources.list && \
+echo "deb http://mirrors.ustc.edu.cn/ubuntu/ focal-security main restricted " >> /etc/apt/sources.list && \
+echo "deb http://mirrors.ustc.edu.cn/ubuntu/ focal-security universe " >> /etc/apt/sources.list && \
+echo "deb http://mirrors.ustc.edu.cn/ubuntu/ focal-security multiverse " >> /etc/apt/sources.list && \
+echo "deb http://archive.canonical.com/ubuntu focal partner " >> /etc/apt/sources.list
+
+
+# debug
+ENTRYPOINT ["bash","-c"]
+CMD ["/bin/server"]

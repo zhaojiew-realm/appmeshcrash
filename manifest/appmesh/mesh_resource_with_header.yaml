@@ -1,0 +1,217 @@
+---
+apiVersion: appmesh.k8s.aws/v1beta2
+kind: Mesh
+metadata:
+  name: appmeshload
+spec:
+  namespaceSelector:
+    matchLabels:
+      mesh: appmeshload
+  #egressFilter:
+  #  type: DROP_ALL
+---
+apiVersion: appmesh.k8s.aws/v1beta2
+kind: VirtualNode
+metadata:
+  name: front
+  namespace: appmeshload
+spec:
+  podSelector:
+    matchLabels:
+      app: front
+  listeners:
+    - portMapping:
+        port: 8090
+        protocol: http
+      # healthCheck:
+      #   protocol: http
+      #   path: '/ping'
+      #   healthyThreshold: 2
+      #   unhealthyThreshold: 5
+      #   timeoutMillis: 2000
+      #   intervalMillis: 5000
+  backends:
+    - virtualService:
+        virtualServiceRef:
+          name: color
+  serviceDiscovery:
+    dns:
+      hostname: front.appmeshload.svc.cluster.local
+---
+# virtual service
+apiVersion: appmesh.k8s.aws/v1beta2
+kind: VirtualService
+metadata:
+  name: front
+  namespace: appmeshload
+spec:
+  awsName: front.appmeshload.svc.cluster.local
+  provider:
+    virtualNode:
+      virtualNodeRef:
+        name: front
+---
+apiVersion: appmesh.k8s.aws/v1beta2
+kind: VirtualService
+metadata:
+  name: fruit
+  namespace: appmeshload
+spec:
+  awsName: fruit.appmeshload.svc.cluster.local
+  provider:
+    virtualRouter:
+      virtualRouterRef:
+        name: fruit-router
+---
+apiVersion: appmesh.k8s.aws/v1beta2
+kind: VirtualService
+metadata:
+  name: color
+  namespace: appmeshload
+spec:
+  awsName: color.appmeshload.svc.cluster.local
+  provider:
+    virtualRouter:
+      virtualRouterRef:
+        name: color-router
+---
+# virtual router
+apiVersion: appmesh.k8s.aws/v1beta2
+kind: VirtualRouter
+metadata:
+  name: color-router
+  namespace: appmeshload
+spec:
+  listeners:
+    - portMapping:
+        port: 8090
+        protocol: http
+  routes:
+    - name: color-route
+      httpRoute:
+        match:
+          prefix: /
+          headers:
+            - name: color
+              match:
+                exact: red
+        action:
+          weightedTargets:
+            - virtualNodeRef:
+                name: red
+              weight: 50
+            - virtualNodeRef:
+                name: blue
+              weight: 50
+    - name: color-route-green
+      httpRoute:
+        match:
+          prefix: /
+          headers:
+            - name: color
+              match:
+                exact: blue
+        action:
+          weightedTargets:
+            - virtualNodeRef:
+                name: blue
+              weight: 1 
+---
+apiVersion: appmesh.k8s.aws/v1beta2
+kind: VirtualRouter
+metadata:
+  name: fruit-router
+  namespace: appmeshload
+spec:
+  listeners:
+    - portMapping:
+        port: 8090
+        protocol: http
+  routes:
+    - name: fruit-route
+      httpRoute:
+        match:
+          prefix: /
+        action:
+          weightedTargets:
+            - virtualNodeRef:
+                name: apple
+              weight: 100
+---
+# color virtual node
+apiVersion: appmesh.k8s.aws/v1beta2
+kind: VirtualNode
+metadata:
+  name: red
+  namespace: appmeshload
+spec:
+  podSelector:
+    matchLabels:
+      app: red
+  listeners:
+    - portMapping:
+        port: 8090
+        protocol: http
+  backends:
+    - virtualService:
+        virtualServiceRef:
+          name: fruit
+  serviceDiscovery:
+    dns:
+      hostname: red.appmeshload.svc.cluster.local
+---
+apiVersion: appmesh.k8s.aws/v1beta2
+kind: VirtualNode
+metadata:
+  name: blue
+  namespace: appmeshload
+spec:
+  podSelector:
+    matchLabels:
+      app: blue
+  listeners:
+    - portMapping:
+        port: 8090
+        protocol: http
+  backends:
+    - virtualService:
+        virtualServiceRef:
+          name: fruit
+  serviceDiscovery:
+    dns:
+      hostname: blue.appmeshload.svc.cluster.local
+---
+# fruit virtual node
+apiVersion: appmesh.k8s.aws/v1beta2
+kind: VirtualNode
+metadata:
+  name: apple
+  namespace: appmeshload
+spec:
+  podSelector:
+    matchLabels:
+      app: apple
+  listeners:
+    - portMapping:
+        port: 8090
+        protocol: http
+  serviceDiscovery:
+    dns:
+      hostname: apple.appmeshload.svc.cluster.local
+---
+apiVersion: appmesh.k8s.aws/v1beta2
+kind: VirtualNode
+metadata:
+  name: banana
+  namespace: appmeshload
+spec:
+  podSelector:
+    matchLabels:
+      app: banana
+  listeners:
+    - portMapping:
+        port: 8090
+        protocol: http
+  serviceDiscovery:
+    dns:
+      hostname: banana.appmeshload.svc.cluster.local
